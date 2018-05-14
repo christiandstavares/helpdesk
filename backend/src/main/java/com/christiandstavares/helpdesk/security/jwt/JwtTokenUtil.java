@@ -15,8 +15,9 @@ import java.util.Map;
 @Component
 public class JwtTokenUtil implements Serializable {
 
-    static final String CLAIM_KEY_USERNAME = "sub";
-    static final String CLAIM_KEY_CREATED = "created";
+    private static final long serialVersionUID = -3301605591108950415L;
+    private static final String CLAIM_KEY_USERNAME = "sub";
+    private static final String CLAIM_KEY_CREATED = "created";
     static final String CLAIM_KEY_EXPIRED = "exp";
 
     @Value("${jwt.secret}")
@@ -27,28 +28,33 @@ public class JwtTokenUtil implements Serializable {
 
     public String getUsernameFromToken(String token) {
         String username;
+
         try {
             final Claims claims = getClaimsFromToken(token);
             username = claims.getSubject();
         } catch (Exception e) {
             username = null;
         }
+
         return username;
     }
 
     public Date getExpirationDateFromToken(String token) {
         Date expiration;
+
         try {
             final Claims claims = getClaimsFromToken(token);
             expiration = claims.getExpiration();
         } catch (Exception e) {
             expiration = null;
         }
+
         return expiration;
     }
 
     private Claims getClaimsFromToken(String token) {
         Claims claims;
+
         try {
             claims = Jwts.parser()
                     .setSigningKey(secret)
@@ -57,21 +63,22 @@ public class JwtTokenUtil implements Serializable {
         } catch (Exception e) {
             claims = null;
         }
+
         return claims;
     }
 
     private Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
+
         return expiration.before(new Date());
     }
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-
-        claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
-
         final Date createdDate = new Date();
+
         claims.put(CLAIM_KEY_CREATED, createdDate);
+        claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
 
         return doGenerateToken(claims);
     }
@@ -92,6 +99,7 @@ public class JwtTokenUtil implements Serializable {
 
     public String refreshToken(String token) {
         String refreshedToken;
+
         try {
             final Claims claims = getClaimsFromToken(token);
             claims.put(CLAIM_KEY_CREATED, new Date());
@@ -99,12 +107,14 @@ public class JwtTokenUtil implements Serializable {
         } catch (Exception e) {
             refreshedToken = null;
         }
+
         return refreshedToken;
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
         JwtUser jwtUser = (JwtUser) userDetails;
         final String username = getUsernameFromToken(token);
+
         return username.equals(jwtUser.getUsername()) && !isTokenExpired(token);
     }
 }

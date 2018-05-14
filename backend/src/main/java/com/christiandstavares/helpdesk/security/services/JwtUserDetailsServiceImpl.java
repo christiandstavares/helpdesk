@@ -12,8 +12,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class JwtUserDetailsServiceImpl implements UserDetailsService {
 
-    @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    public JwtUserDetailsServiceImpl(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -21,7 +25,7 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
         Usuario usuario = usuarioService.buscarPorEmail(email);
 
         if (usuario == null) {
-            throw new UsernameNotFoundException(String.format("Nenhum usuário encontrado para o username '%s'.", email));
+            throw new UsernameNotFoundException(String.format("No user found with username '%s'.", email));
         } else {
             return JwtUserFactory.create(usuario);
         }

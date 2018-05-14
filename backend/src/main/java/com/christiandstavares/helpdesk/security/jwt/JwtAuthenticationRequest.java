@@ -4,15 +4,17 @@ import java.io.Serializable;
 
 public class JwtAuthenticationRequest implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private String email;
     private String password;
 
     public JwtAuthenticationRequest() {
+        super();
     }
 
     public JwtAuthenticationRequest(String email, String password) {
-        this.email = email;
-        this.password = password;
+        this.setEmail(email);
+        this.setPassword(password);
     }
 
     public String getEmail() {

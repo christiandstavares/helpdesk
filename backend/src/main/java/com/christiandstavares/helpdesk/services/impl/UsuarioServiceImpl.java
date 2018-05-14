@@ -14,8 +14,12 @@ import java.util.Optional;
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
 
-    @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
+    }
 
     @Override
     public Usuario buscarPorEmail(String email) {
@@ -28,18 +32,18 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public Optional<Usuario> buscarPorId(String id) {
-        return this.usuarioRepository.findById(id);
+    public Usuario buscarPorId(String id) {
+        return this.usuarioRepository.findOne(id);
     }
 
     @Override
     public void excluir(String id) {
-        this.usuarioRepository.deleteById(id);
+        this.usuarioRepository.delete(id);
     }
 
     @Override
     public Page<Usuario> buscarTodos(int page, int count) {
-        Pageable pageable = PageRequest.of(page, count);
+        Pageable pageable = new PageRequest(page, count);
         return this.usuarioRepository.findAll(pageable);
     }
 }

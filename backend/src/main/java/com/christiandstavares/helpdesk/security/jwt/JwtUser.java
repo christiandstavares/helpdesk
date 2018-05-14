@@ -8,6 +8,8 @@ import java.util.Collection;
 
 public class JwtUser implements UserDetails {
 
+    private static final long serialVersionUID = 1L;
+
     private final String id;
     private final String username;
     private final String password;
@@ -22,23 +24,23 @@ public class JwtUser implements UserDetails {
 
     @JsonIgnore
     public String getId() {
-        return this.id;
+        return id;
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.authorities;
+    public String getUsername() {
+        return username;
     }
 
     @JsonIgnore
     @Override
     public String getPassword() {
-        return this.password;
+        return password;
     }
 
     @Override
-    public String getUsername() {
-        return this.username;
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
     }
 
     @JsonIgnore

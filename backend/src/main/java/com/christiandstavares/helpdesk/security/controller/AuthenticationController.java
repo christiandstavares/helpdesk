@@ -25,27 +25,31 @@ import javax.servlet.http.HttpServletRequest;
 @CrossOrigin(origins = "*")
 public class AuthenticationController {
 
-    @Autowired
     private AuthenticationManager authenticationManager;
 
-    @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
-    @Autowired
     private UserDetailsService userDetailsService;
 
-    @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    public AuthenticationController(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, UserDetailsService userDetailsService, UsuarioService usuarioService) {
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenUtil = jwtTokenUtil;
+        this.userDetailsService = userDetailsService;
+        this.usuarioService = usuarioService;
+    }
 
     @PostMapping(value = "/api/auth")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtAuthenticationRequest jwtAuthenticationRequest) throws AuthenticationException {
 
         final Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(jwtAuthenticationRequest.getEmail(), jwtAuthenticationRequest.getPassword()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
         final UserDetails userDetails = userDetailsService.loadUserByUsername(jwtAuthenticationRequest.getEmail());
         final String token = jwtTokenUtil.generateToken(userDetails);
         final Usuario usuario = usuarioService.buscarPorEmail(jwtAuthenticationRequest.getEmail());
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
         usuario.setSenha(null);
 
         return ResponseEntity.ok(new CurrentUser(token, usuario));
@@ -56,10 +60,10 @@ public class AuthenticationController {
 
         String token = httpServletRequest.getHeader("Authorization");
         String username = jwtTokenUtil.getUsernameFromToken(token);
-        final Usuario usuario = usuarioService.buscarPorEmail(username);
 
         if (jwtTokenUtil.canTokenBeRefreshed(token)) {
             String refreshedToken = jwtTokenUtil.refreshToken(token);
+            final Usuario usuario = usuarioService.buscarPorEmail(username);
             return ResponseEntity.ok(new CurrentUser(refreshedToken, usuario));
         } else {
             return ResponseEntity.badRequest().body(null);

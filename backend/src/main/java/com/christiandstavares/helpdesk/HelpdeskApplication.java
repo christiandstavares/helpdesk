@@ -18,19 +18,16 @@ public class HelpdeskApplication {
 
 	@Bean
 	CommandLineRunner init(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
-		return args -> {
-			initUsers(usuarioRepository, passwordEncoder);
-		};
+		return args -> initUsers(usuarioRepository, passwordEncoder);
 	}
 
 	private void initUsers(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+		if (usuarioRepository.findByEmail("admin@helpdesk.com") == null) {
+			Usuario admin = new Usuario();
+			admin.setEmail("admin@helpdesk.com");
+			admin.setSenha(passwordEncoder.encode("123456"));
+			admin.setPerfil(PerfilEnum.ROLE_ADMIN);
 
-		Usuario admin = new Usuario();
-		admin.setEmail("admin@helpdesk.com");
-		admin.setSenha(passwordEncoder.encode("123456"));
-		admin.setPerfil(PerfilEnum.ROLE_ADMIN);
-
-		if (usuarioRepository.findByEmail(admin.getEmail()) == null) {
 			usuarioRepository.save(admin);
 		}
 	}
