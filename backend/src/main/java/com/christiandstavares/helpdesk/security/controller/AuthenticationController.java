@@ -17,12 +17,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @CrossOrigin(origins = "*")
+@RequestMapping("auth")
 public class AuthenticationController {
 
     private AuthenticationManager authenticationManager;
@@ -41,7 +43,7 @@ public class AuthenticationController {
         this.usuarioService = usuarioService;
     }
 
-    @PostMapping(value = "/api/auth")
+    @PostMapping
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtAuthenticationRequest jwtAuthenticationRequest) throws AuthenticationException {
 
         final Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(jwtAuthenticationRequest.getEmail(), jwtAuthenticationRequest.getPassword()));
@@ -55,7 +57,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(new CurrentUser(token, usuario));
     }
 
-    @PostMapping(value = "/api/refresh")
+    @PostMapping(value = "/refresh")
     public ResponseEntity<?> refreshAndGetAuthenticationToken(HttpServletRequest httpServletRequest) {
 
         String token = httpServletRequest.getHeader("Authorization");
